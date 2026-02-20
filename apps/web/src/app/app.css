@@ -81,16 +81,15 @@ body {
 /* ===== Mobile Bottom Navbar ===== */
 .mobile-bottom-nav {
   display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
+  position: relative;
   z-index: 50;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid #e2e8f0;
-  padding: 6px 0 env(safe-area-inset-bottom, 8px);
+  padding: 6px 0 calc(env(safe-area-inset-bottom, 8px) + 8px);
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
 }
 
@@ -163,11 +162,6 @@ body {
 @media (max-width: 1023px) {
   .mobile-bottom-nav {
     display: block;
-  }
-
-  /* Add padding for bottom nav so content isn't hidden */
-  .dashboard-main-content {
-    padding-bottom: 80px !important;
   }
 }
 

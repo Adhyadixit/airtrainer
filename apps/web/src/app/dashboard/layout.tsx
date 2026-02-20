@@ -119,7 +119,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     })();
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] font-sans flex text-slate-900 selection:bg-indigo-500/30">
+        <div className="h-[100dvh] overflow-hidden bg-[#F8FAFC] font-sans flex text-slate-900 selection:bg-indigo-500/30">
             {/* Desktop Sidebar — hidden on mobile */}
             <aside
                 className="hidden lg:flex fixed top-0 h-screen inset-y-0 left-0 z-50 w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.02)] border-r border-slate-100 flex-col"
@@ -200,7 +200,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-h-screen overflow-hidden bg-slate-50/30 lg:ml-[280px]">
+            <div className="flex-1 flex flex-col h-[100dvh] overflow-hidden bg-slate-50/30 lg:ml-[280px]">
                 {/* Mobile Header — simplified, no hamburger needed */}
                 <header className="lg:hidden h-16 bg-white/90 backdrop-blur-lg border-b border-slate-200/60 sticky top-0 flex items-center justify-between px-4 z-30 shadow-sm">
                     <Link href="/dashboard" className="flex items-center gap-2.5">

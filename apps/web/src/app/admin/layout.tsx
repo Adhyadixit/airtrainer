@@ -74,7 +74,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     ];
 
     return (
-        <div className="flex h-screen bg-[#f8fafc] text-[#0f172a] font-sans overflow-hidden">
+        <div className="flex h-[100dvh] bg-[#f8fafc] text-[#0f172a] font-sans overflow-hidden">
             {/* Desktop Sidebar — hidden on mobile */}
             <aside className="w-64 bg-white border-r border-[#e2e8f0] flex-col hidden md:flex z-10 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
                 <div className="h-[80px] flex items-center px-6 border-b border-[#e2e8f0]">
@@ -133,7 +133,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
+            <main className="flex-1 flex flex-col h-[100dvh] overflow-hidden relative">
                 {/* Mobile Header */}
                 <header className="md:hidden h-14 bg-white/90 backdrop-blur-lg border-b border-[#e2e8f0] flex items-center justify-between px-4 sticky top-0 z-10 shadow-sm">
                     <Link href="/admin" className="flex items-center gap-2">
