@@ -38,6 +38,9 @@ export default function SubAccountsPage() {
         skill_level: "beginner",
         notes: "",
     });
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     useEffect(() => {
         const session = getSession();
@@ -81,8 +84,31 @@ export default function SubAccountsPage() {
         setShowForm(true);
     };
 
+    const validateForm = (): boolean => {
+        const errors: Record<string, string> = {};
+        
+        if (!form.first_name.trim()) {
+            errors.first_name = "First name is required";
+        } else if (form.first_name.trim().length < 2) {
+            errors.first_name = "First name must be at least 2 characters";
+        }
+        
+        if (!form.last_name.trim()) {
+            errors.last_name = "Last name is required";
+        } else if (form.last_name.trim().length < 2) {
+            errors.last_name = "Last name must be at least 2 characters";
+        }
+        
+        if (form.age && (Number(form.age) < 3 || Number(form.age) > 99)) {
+            errors.age = "Age must be between 3 and 99";
+        }
+        
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const saveAccount = async () => {
-        if (!user || !form.first_name || !form.last_name) return;
+        if (!user || !validateForm()) return;
         setSaving(true);
 
         const profileData = {
@@ -124,11 +150,17 @@ export default function SubAccountsPage() {
 
     const deleteAccount = async (id: string) => {
         if (!confirm("Remove this sub-account? This cannot be undone.")) return;
+        setDeletingId(id);
+        setDeleteError(null);
         try {
-            await supabase.from("sub_accounts").delete().eq("id", id);
+            const { error } = await supabase.from("sub_accounts").delete().eq("id", id);
+            if (error) throw error;
             setAccounts((prev) => prev.filter((a) => a.id !== id));
         } catch (err) {
             console.error("Delete failed:", err);
+            setDeleteError("Failed to delete sub-account. Please try again.");
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -183,15 +215,18 @@ export default function SubAccountsPage() {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                         <div>
                             <label style={{ display: "block", fontSize: "13px", fontWeight: 600, marginBottom: "6px", color: "var(--gray-600)" }}>First Name *</label>
-                            <input value={form.first_name} onChange={(e) => setForm((p) => ({ ...p, first_name: e.target.value }))} style={inputStyle} placeholder="First name" />
+                            <input value={form.first_name} onChange={(e) => { setForm((p) => ({ ...p, first_name: e.target.value })); setFormErrors((p) => ({ ...p, first_name: "" })); }} style={{ ...inputStyle, borderColor: formErrors.first_name ? "#ef4444" : "var(--gray-200)" }} placeholder="First name" />
+                            {formErrors.first_name && <span style={{ fontSize: "12px", color: "#ef4444", marginTop: "4px", display: "block" }}>{formErrors.first_name}</span>}
                         </div>
                         <div>
                             <label style={{ display: "block", fontSize: "13px", fontWeight: 600, marginBottom: "6px", color: "var(--gray-600)" }}>Last Name *</label>
-                            <input value={form.last_name} onChange={(e) => setForm((p) => ({ ...p, last_name: e.target.value }))} style={inputStyle} placeholder="Last name" />
+                            <input value={form.last_name} onChange={(e) => { setForm((p) => ({ ...p, last_name: e.target.value })); setFormErrors((p) => ({ ...p, last_name: "" })); }} style={{ ...inputStyle, borderColor: formErrors.last_name ? "#ef4444" : "var(--gray-200)" }} placeholder="Last name" />
+                            {formErrors.last_name && <span style={{ fontSize: "12px", color: "#ef4444", marginTop: "4px", display: "block" }}>{formErrors.last_name}</span>}
                         </div>
                         <div>
                             <label style={{ display: "block", fontSize: "13px", fontWeight: 600, marginBottom: "6px", color: "var(--gray-600)" }}>Age</label>
-                            <input type="number" value={form.age} onChange={(e) => setForm((p) => ({ ...p, age: e.target.value }))} style={inputStyle} min={3} max={99} placeholder="Age" />
+                            <input type="number" value={form.age} onChange={(e) => { setForm((p) => ({ ...p, age: e.target.value })); setFormErrors((p) => ({ ...p, age: "" })); }} style={{ ...inputStyle, borderColor: formErrors.age ? "#ef4444" : "var(--gray-200)" }} min={3} max={99} placeholder="Age" />
+                            {formErrors.age && <span style={{ fontSize: "12px", color: "#ef4444", marginTop: "4px", display: "block" }}>{formErrors.age}</span>}
                         </div>
                         <div>
                             <label style={{ display: "block", fontSize: "13px", fontWeight: 600, marginBottom: "6px", color: "var(--gray-600)" }}>Primary Sport</label>
@@ -275,15 +310,21 @@ export default function SubAccountsPage() {
                             )}
 
                             <div style={{ display: "flex", gap: "8px" }}>
-                                <button onClick={() => startEdit(acct)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-md)", border: "1px solid var(--gray-200)", background: "var(--surface)", color: "var(--gray-600)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                                <button onClick={() => startEdit(acct)} disabled={deletingId === acct.id} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-md)", border: "1px solid var(--gray-200)", background: "var(--surface)", color: "var(--gray-600)", fontSize: "13px", fontWeight: 600, cursor: deletingId === acct.id ? "not-allowed" : "pointer", opacity: deletingId === acct.id ? 0.5 : 1 }}>
                                     Edit
                                 </button>
-                                <button onClick={() => deleteAccount(acct.id)} style={{ padding: "8px 14px", borderRadius: "var(--radius-md)", border: "1px solid #fecaca", background: "#fef2f2", color: "#ef4444", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-                                    Remove
+                                <button onClick={() => deleteAccount(acct.id)} disabled={deletingId === acct.id} style={{ padding: "8px 14px", borderRadius: "var(--radius-md)", border: "1px solid #fecaca", background: "#fef2f2", color: "#ef4444", fontSize: "13px", fontWeight: 600, cursor: deletingId === acct.id ? "not-allowed" : "pointer", opacity: deletingId === acct.id ? 0.7 : 1 }}>
+                                    {deletingId === acct.id ? "Removing..." : "Remove"}
                                 </button>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {deleteError && (
+                <div style={{ marginTop: "16px", padding: "12px 16px", background: "#fef2f2", borderRadius: "var(--radius-md)", color: "#dc2626", fontSize: "14px", fontWeight: 600, borderLeft: "4px solid #dc2626" }}>
+                    ❌ {deleteError}
                 </div>
             )}
         </div>

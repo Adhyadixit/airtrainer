@@ -102,15 +102,67 @@ export default function SearchTrainersPage() {
         return true;
     });
 
+    const [bookingError, setBookingError] = useState<string | null>(null);
+
     const handleBookTrainer = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!bookingModal || !user) return;
         setBookingLoading(true);
+        setBookingError(null);
 
         try {
-            const scheduledAt = new Date(`${bookingForm.date}T${bookingForm.time}`).toISOString();
-            const rate = Number(bookingModal.hourly_rate);
+            const scheduledAt = new Date(`${bookingForm.date}T${bookingForm.time}`);
             const duration = Number(bookingForm.duration);
+            const endTime = new Date(scheduledAt.getTime() + duration * 60 * 1000);
+
+            // Check trainer availability slots
+            const dayOfWeek = scheduledAt.getDay();
+            const startTimeStr = `${String(scheduledAt.getHours()).padStart(2, '0')}:${String(scheduledAt.getMinutes()).padStart(2, '0')}:00`;
+            const endTimeStr = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}:00`;
+
+            const { data: availabilitySlots } = await supabase
+                .from("availability_slots")
+                .select("*")
+                .eq("trainer_id", bookingModal.user_id)
+                .eq("day_of_week", dayOfWeek)
+                .eq("is_active", true);
+
+            // Check if booking time falls within any availability slot
+            const isWithinAvailability = (availabilitySlots || []).some((slot: { start_time: string; end_time: string }) => {
+                return startTimeStr >= slot.start_time && endTimeStr <= slot.end_time;
+            });
+
+            if (availabilitySlots && availabilitySlots.length > 0 && !isWithinAvailability) {
+                setBookingError("This trainer is not available at the selected time. Please choose a time within their availability.");
+                setBookingLoading(false);
+                return;
+            }
+
+            // Check for overlapping bookings (Double Booking Prevention)
+            const { data: existingBookings } = await supabase
+                .from("bookings")
+                .select("id, scheduled_at, duration_minutes")
+                .eq("trainer_id", bookingModal.user_id)
+                .in("status", ["pending", "confirmed"])
+                .gte("scheduled_at", new Date(scheduledAt.getTime() - 24 * 60 * 60 * 1000).toISOString())
+                .lte("scheduled_at", new Date(scheduledAt.getTime() + 24 * 60 * 60 * 1000).toISOString());
+
+            // Check for time overlap
+            const hasConflict = (existingBookings || []).some((booking: { scheduled_at: string; duration_minutes: number }) => {
+                const existingStart = new Date(booking.scheduled_at);
+                const existingEnd = new Date(existingStart.getTime() + booking.duration_minutes * 60 * 1000);
+                
+                // Check if new booking overlaps with existing booking
+                return (scheduledAt < existingEnd && endTime > existingStart);
+            });
+
+            if (hasConflict) {
+                setBookingError("This trainer already has a booking at this time. Please choose a different time slot.");
+                setBookingLoading(false);
+                return;
+            }
+
+            const rate = Number(bookingModal.hourly_rate);
             const price = (rate * duration) / 60;
             const platformFee = price * 0.03;
             const totalPaid = price + platformFee;
@@ -416,6 +468,12 @@ export default function SearchTrainersPage() {
                                             </span>
                                         </div>
                                     </div>
+
+                                    {bookingError && (
+                                        <div style={{ padding: "12px", background: "#fee2e2", borderRadius: "var(--radius-md)", marginBottom: "16px", color: "#dc2626", fontSize: "14px" }}>
+                                            ⚠️ {bookingError}
+                                        </div>
+                                    )}
 
                                     <button
                                         type="submit"

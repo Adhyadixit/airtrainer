@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { getSession, setSession, clearSession, AuthUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+    const router = useRouter();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -108,7 +110,7 @@ export default function ProfilePage() {
 
             // Clear session and redirect to login
             await clearSession();
-            window.location.href = "/auth/login";
+            router.push("/auth/login");
         } catch (err) {
             console.error("Failed to delete account:", err);
             setDeleting(false);

@@ -235,32 +235,29 @@ export default function TrainerProfilePage() {
                         </p>
 
                         {user?.role === "athlete" ? (
-                            <button
-                                onClick={() => router.push(`/dashboard/search`)}
+                            <a
+                                href="/dashboard/search"
                                 style={{
-                                    width: "100%", padding: "14px", borderRadius: "var(--radius-md)",
+                                    display: "block", width: "100%", padding: "14px", borderRadius: "var(--radius-md)",
                                     background: "var(--gradient-primary)", color: "white", border: "none",
-                                    fontWeight: 700, fontSize: "15px", cursor: "pointer",
-                                    boxShadow: "0 4px 12px rgba(99, 102, 241, 0.35)",
+                                    fontWeight: 700, fontSize: "15px", cursor: "pointer", textAlign: "center", textDecoration: "none",
+                                    boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
                                 }}
                             >
-                                Book a Session
-                            </button>
-                        ) : user ? (
-                            <p style={{ fontSize: "13px", color: "var(--gray-400)", textAlign: "center" }}>
-                                Switch to an athlete account to book
-                            </p>
+                                Book Session
+                            </a>
                         ) : (
-                            <button
-                                onClick={() => router.push("/auth/login")}
+                            <a
+                                href="/auth/login"
                                 style={{
-                                    width: "100%", padding: "14px", borderRadius: "var(--radius-md)",
+                                    display: "block", width: "100%", padding: "14px", borderRadius: "var(--radius-md)",
                                     background: "var(--gradient-primary)", color: "white", border: "none",
-                                    fontWeight: 700, fontSize: "15px", cursor: "pointer",
+                                    fontWeight: 700, fontSize: "15px", cursor: "pointer", textAlign: "center", textDecoration: "none",
+                                    boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
                                 }}
                             >
-                                Log in to Book
-                            </button>
+                                Sign Up to Book
+                            </a>
                         )}
 
                         <div style={{ marginTop: "20px", borderTop: "1px solid var(--gray-100)", paddingTop: "16px" }}>

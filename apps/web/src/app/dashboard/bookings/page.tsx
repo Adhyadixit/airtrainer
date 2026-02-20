@@ -115,6 +115,30 @@ export default function BookingsPage() {
                         read: false,
                     });
                 }
+
+                // Send notification when trainer rejects booking
+                if (newStatus === "rejected" && isTrainer) {
+                    await supabase.from("notifications").insert({
+                        user_id: booking.athlete_id,
+                        type: "BOOKING_REJECTED",
+                        title: "Booking Rejected",
+                        body: `Your booking request for ${booking.sport} was declined by the trainer.`,
+                        data: { booking_id: bookingId },
+                        read: false,
+                    });
+                }
+
+                // Send notification when trainer cancels (to athlete)
+                if (newStatus === "cancelled" && isTrainer) {
+                    await supabase.from("notifications").insert({
+                        user_id: booking.athlete_id,
+                        type: "BOOKING_CANCELLED",
+                        title: "Booking Cancelled",
+                        body: `Your booking for ${booking.sport} has been cancelled by the trainer.`,
+                        data: { booking_id: bookingId },
+                        read: false,
+                    });
+                }
             }
 
             setBookings((prev) =>
@@ -173,11 +197,12 @@ export default function BookingsPage() {
         confirmed: { bg: "#dbeafe", text: "#2563eb" },
         completed: { bg: "#d1fae5", text: "#059669" },
         cancelled: { bg: "#fee2e2", text: "#dc2626" },
+        rejected: { bg: "#fecaca", text: "#b91c1c" },
         no_show: { bg: "#fae8ff", text: "#9333ea" },
         disputed: { bg: "#fecaca", text: "#b91c1c" },
     };
 
-    const filters = ["all", "pending", "confirmed", "completed", "cancelled"];
+    const filters = ["all", "pending", "confirmed", "completed", "cancelled", "rejected"];
 
     if (loading) {
         return (
@@ -325,24 +350,60 @@ export default function BookingsPage() {
                                         {/* Action buttons */}
                                         <div style={{ marginTop: "12px", display: "flex", gap: "8px", justifyContent: "flex-end" }}>
                                             {booking.status === "pending" && isTrainer && (
+                                                <>
+                                                    <button
+                                                        onClick={() => updateBookingStatus(booking.id, "confirmed")}
+                                                        disabled={actionLoading === booking.id}
+                                                        style={{
+                                                            padding: "6px 14px",
+                                                            borderRadius: "var(--radius-md)",
+                                                            background: "#059669",
+                                                            color: "white",
+                                                            border: "none",
+                                                            fontSize: "12px",
+                                                            fontWeight: 600,
+                                                            cursor: "pointer",
+                                                        }}
+                                                    >
+                                                        {actionLoading === booking.id ? "..." : "✓ Confirm"}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updateBookingStatus(booking.id, "rejected")}
+                                                        disabled={actionLoading === booking.id}
+                                                        style={{
+                                                            padding: "6px 14px",
+                                                            borderRadius: "var(--radius-md)",
+                                                            background: "transparent",
+                                                            color: "#dc2626",
+                                                            border: "1px solid #fca5a5",
+                                                            fontSize: "12px",
+                                                            fontWeight: 600,
+                                                            cursor: "pointer",
+                                                        }}
+                                                    >
+                                                        ✗ Reject
+                                                    </button>
+                                                </>
+                                            )}
+                                            {booking.status === "confirmed" && !isPast && (
                                                 <button
-                                                    onClick={() => updateBookingStatus(booking.id, "confirmed")}
+                                                    onClick={() => updateBookingStatus(booking.id, "cancelled")}
                                                     disabled={actionLoading === booking.id}
                                                     style={{
                                                         padding: "6px 14px",
                                                         borderRadius: "var(--radius-md)",
-                                                        background: "#059669",
-                                                        color: "white",
-                                                        border: "none",
+                                                        background: "transparent",
+                                                        color: "#dc2626",
+                                                        border: "1px solid #fca5a5",
                                                         fontSize: "12px",
                                                         fontWeight: 600,
                                                         cursor: "pointer",
                                                     }}
                                                 >
-                                                    {actionLoading === booking.id ? "..." : "✓ Confirm"}
+                                                    Cancel
                                                 </button>
                                             )}
-                                            {(booking.status === "pending" || booking.status === "confirmed") && !isPast && (
+                                            {booking.status === "pending" && !isTrainer && !isPast && (
                                                 <button
                                                     onClick={() => updateBookingStatus(booking.id, "cancelled")}
                                                     disabled={actionLoading === booking.id}

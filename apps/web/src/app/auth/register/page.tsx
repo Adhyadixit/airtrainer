@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { registerUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 const SPORTS = [
     "Hockey", "Baseball", "Basketball", "Football", "Soccer",
@@ -10,6 +11,7 @@ const SPORTS = [
 ];
 
 export default function RegisterPage() {
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const [role, setRole] = useState<"athlete" | "trainer" | "">("");
     const [formData, setFormData] = useState({
@@ -104,7 +106,7 @@ export default function RegisterPage() {
                 dateOfBirth: formData.dateOfBirth,
                 sports: formData.selectedSports,
             });
-            window.location.href = "/dashboard";
+            router.push("/dashboard");
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Registration failed");
         } finally {
