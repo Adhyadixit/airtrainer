@@ -188,29 +188,29 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                         {children}
                     </div>
                 </div>
-            </main>
 
-            {/* Mobile Bottom Navigation Bar */}
-            <div className="mobile-bottom-nav md:hidden">
-                <div className="mobile-bottom-nav-items">
-                    {mobileNavItems.map((item) => {
-                        const isActive = (() => {
-                            if (item.href === "/admin") return typeof window !== "undefined" && window.location.pathname === "/admin";
-                            return typeof window !== "undefined" && window.location.pathname.startsWith(item.href);
-                        })();
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`mobile-bottom-nav-item ${isActive ? "active" : ""}`}
-                            >
-                                <item.icon size={22} />
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
+                {/* Mobile Bottom Navigation Bar */}
+                <div className="mobile-bottom-nav md:hidden">
+                    <div className="mobile-bottom-nav-items">
+                        {mobileNavItems.map((item) => {
+                            const isActive = (() => {
+                                if (item.href === "/admin") return typeof window !== "undefined" && window.location.pathname === "/admin";
+                                return typeof window !== "undefined" && window.location.pathname.startsWith(item.href);
+                            })();
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`mobile-bottom-nav-item ${isActive ? "active" : ""}`}
+                                >
+                                    <item.icon size={22} />
+                                    <span>{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            </main>
 
             <style>{`
         .custom-scrollbar::-webkit-scrollbar {

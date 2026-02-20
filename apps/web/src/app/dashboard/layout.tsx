@@ -245,24 +245,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         {children}
                     </div>
                 </main>
-            </div>
 
-            {/* Mobile Bottom Navigation Bar */}
-            <div className="mobile-bottom-nav lg:hidden">
-                <div className="mobile-bottom-nav-items">
-                    {mobileNavItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`mobile-bottom-nav-item ${isActive ? "active" : ""}`}
-                            >
-                                <item.icon size={22} />
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
+                {/* Mobile Bottom Navigation Bar */}
+                <div className="mobile-bottom-nav lg:hidden">
+                    <div className="mobile-bottom-nav-items">
+                        {mobileNavItems.map((item) => {
+                            const isActive = pathname === item.href;
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`mobile-bottom-nav-item ${isActive ? "active" : ""}`}
+                                >
+                                    <item.icon size={22} />
+                                    <span>{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
