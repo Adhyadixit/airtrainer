@@ -127,6 +127,14 @@ export async function registerUser(data: {
     role: 'athlete' | 'trainer';
     dateOfBirth: string;
     sports?: string[];
+    // Athlete-specific preferences
+    skillLevel?: string;
+    preferredTimes?: string[];
+    trainingTypes?: string[];
+    budgetMax?: number;
+    city?: string;
+    state?: string;
+    travelRadius?: number;
 }): Promise<AuthUser> {
     const cleanEmail = data.email.toLowerCase().trim();
 
@@ -209,6 +217,12 @@ export async function registerUser(data: {
             .insert({
                 user_id: u.id,
                 sports: data.sports || [],
+                skill_level: data.skillLevel || 'beginner',
+                preferred_training_times: data.preferredTimes || [],
+                training_preferences: data.trainingTypes || [],
+                city: data.city || null,
+                state: data.state || null,
+                travel_radius_miles: data.travelRadius || 25,
             })
             .select()
             .single();

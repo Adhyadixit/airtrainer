@@ -18,7 +18,9 @@ import {
     Clock,
     ShieldAlert,
     ChevronRight,
-    Zap
+    Zap,
+    Send,
+    ClipboardList
 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -70,6 +72,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const navItems = [
         ...(user.role === "trainer" ? [
             { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+            { label: "Setup Profile", href: "/dashboard/trainer/setup", icon: ClipboardList },
+            { label: "Training Offers", href: "/dashboard/trainer/offers", icon: Send },
             { label: "Availability", href: "/dashboard/availability", icon: Clock },
             { label: "Bookings", href: "/dashboard/bookings", icon: Calendar },
             { label: "Earnings", href: "/dashboard/earnings", icon: CreditCard },
