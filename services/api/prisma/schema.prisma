@@ -47,6 +47,8 @@ model User {
   refreshTokens    RefreshToken[]
   messages         Message[]          @relation("SenderMessages")
   messagesReceived Message[]          @relation("ReceiverMessages")
+  offersAsTrainer  TrainingOffer[]    @relation("TrainerOffers")
+  offersAsAthlete  TrainingOffer[]    @relation("AthleteOffers")
 
   @@map("users")
 }
@@ -75,6 +77,8 @@ model AthleteProfile {
   userId           String   @unique @map("user_id") @db.Uuid
   skillLevel       SkillLevel?  @map("skill_level")
   sports           String[]
+  preferredTrainingTimes TimeOfDay[]
+  trainingPreferences    TrainingType[]
   addressLine1     String?  @map("address_line1") @db.VarChar(255)
   addressLine2     String?  @map("address_line2") @db.VarChar(255)
   city             String?  @db.VarChar(100)
@@ -118,6 +122,8 @@ model TrainerProfile {
   yearsExperience       Int?     @map("years_experience")
   hourlyRate            Decimal  @default(50) @map("hourly_rate") @db.Decimal(10, 2)
   sports                String[]
+  trainingTypes         TrainingType[]
+  preferredTrainingTimes TimeOfDay[]
   verificationStatus    VerificationStatus @default(pending) @map("verification_status")
   isVerified            Boolean  @default(false) @map("is_verified")
   subscriptionStatus    SubscriptionStatus @default(trial) @map("subscription_status")
@@ -276,6 +282,28 @@ model Dispute {
 }
 
 // ============================================
+// Training Offers
+// ============================================
+model TrainingOffer {
+  id               String       @id @default(uuid()) @db.Uuid
+  trainerId        String       @map("trainer_id") @db.Uuid
+  athleteId        String       @map("athlete_id") @db.Uuid
+  status           OfferStatus  @default(pending)
+  message          String?      @db.Text
+  price            Decimal      @db.Decimal(10, 2)
+  sessionLengthMin Int          @default(60) @map("session_length_min")
+  proposedDates    Json?        @map("proposed_dates")
+  sport            String?      @db.VarChar(50)
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  trainer User @relation("TrainerOffers", fields: [trainerId], references: [id])
+  athlete User @relation("AthleteOffers", fields: [athleteId], references: [id])
+
+  @@map("training_offers")
+}
+
+// ============================================
 // Notifications
 // ============================================
 model Notification {
@@ -397,4 +425,26 @@ enum DisputeStatus {
   under_review
   resolved
   escalated
+}
+
+enum TimeOfDay {
+  morning
+  afternoon
+  evening
+}
+
+enum TrainingType {
+  one_on_one
+  group
+  skill_specific
+  strength_conditioning
+  pre_season
+  in_season
+}
+
+enum OfferStatus {
+  pending
+  accepted
+  declined
+  expired
 }

@@ -12,7 +12,9 @@ import {
     CreditCard,
     ShieldAlert,
     Settings,
-    LogOut
+    LogOut,
+    Bell,
+    Zap
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -53,19 +55,27 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
     if (!user) return null;
     const menuItems = [
-        { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/admin" },
-        { icon: <Users size={20} />, label: "Athletes", href: "/admin/athletes" },
-        { icon: <Dumbbell size={20} />, label: "Trainers", href: "/admin/trainers" },
-        { icon: <CalendarCheck size={20} />, label: "Bookings", href: "/admin/bookings" },
-        { icon: <CreditCard size={20} />, label: "Payments", href: "/admin/payments" },
-        { icon: <ShieldAlert size={20} />, label: "Disputes", href: "/admin/disputes" },
-        { icon: <Settings size={20} />, label: "Settings", href: "/admin/settings" },
+        { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/admin", mobileIcon: LayoutDashboard },
+        { icon: <Users size={20} />, label: "Athletes", href: "/admin/athletes", mobileIcon: Users },
+        { icon: <Dumbbell size={20} />, label: "Trainers", href: "/admin/trainers", mobileIcon: Dumbbell },
+        { icon: <CalendarCheck size={20} />, label: "Bookings", href: "/admin/bookings", mobileIcon: CalendarCheck },
+        { icon: <CreditCard size={20} />, label: "Payments", href: "/admin/payments", mobileIcon: CreditCard },
+        { icon: <ShieldAlert size={20} />, label: "Disputes", href: "/admin/disputes", mobileIcon: ShieldAlert },
+        { icon: <Settings size={20} />, label: "Settings", href: "/admin/settings", mobileIcon: Settings },
+    ];
+
+    const mobileNavItems = [
+        { label: "Home", href: "/admin", icon: LayoutDashboard },
+        { label: "Athletes", href: "/admin/athletes", icon: Users },
+        { label: "Trainers", href: "/admin/trainers", icon: Dumbbell },
+        { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+        { label: "Settings", href: "/admin/settings", icon: Settings },
     ];
 
     return (
         <div className="flex h-screen bg-[#f8fafc] text-[#0f172a] font-sans overflow-hidden">
-            {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-[#e2e8f0] flex flex-col hidden md:flex z-10 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
+            {/* Desktop Sidebar — hidden on mobile */}
+            <aside className="w-64 bg-white border-r border-[#e2e8f0] flex-col hidden md:flex z-10 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
                 <div className="h-[80px] flex items-center px-6 border-b border-[#e2e8f0]">
                     <Link href="/admin" className="flex items-center gap-2">
                         <div className="w-[36px] h-[36px] rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white font-black text-lg shadow-md shadow-blue-500/20">
@@ -123,8 +133,25 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-                {/* Top Header */}
-                <header className="h-[80px] bg-white/80 backdrop-blur-md border-b border-[#e2e8f0] flex items-center justify-between px-8 sticky top-0 z-10 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+                {/* Mobile Header */}
+                <header className="md:hidden h-14 bg-white/90 backdrop-blur-lg border-b border-[#e2e8f0] flex items-center justify-between px-4 sticky top-0 z-10 shadow-sm">
+                    <Link href="/admin" className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                            A
+                        </div>
+                        <span className="text-lg font-black bg-gradient-to-br from-[#1e3a8a] to-[#2563eb] bg-clip-text text-transparent tracking-tight">
+                            Admin
+                        </span>
+                    </Link>
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1e3a8a] to-[#3b82f6] flex items-center justify-center text-white text-xs font-bold">
+                            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                        </div>
+                    </div>
+                </header>
+
+                {/* Desktop Header */}
+                <header className="hidden md:flex h-[80px] bg-white/80 backdrop-blur-md border-b border-[#e2e8f0] items-center justify-between px-8 sticky top-0 z-10 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
                     <h1 className="text-2xl font-black text-[#0f172a] tracking-tight">Dashboard Overview</h1>
                     <div className="flex items-center gap-4">
                         <div className="h-10 px-4 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] flex items-center gap-2 text-[#64748b] text-sm font-medium">
@@ -135,12 +162,34 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </header>
 
                 {/* Scrollable Content Area */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 dashboard-main-content">
                     <div className="max-w-7xl mx-auto animation-fade-in-up">
                         {children}
                     </div>
                 </div>
             </main>
+
+            {/* Mobile Bottom Navigation Bar */}
+            <div className="mobile-bottom-nav md:hidden">
+                <div className="mobile-bottom-nav-items">
+                    {mobileNavItems.map((item) => {
+                        const isActive = (() => {
+                            if (item.href === "/admin") return typeof window !== "undefined" && window.location.pathname === "/admin";
+                            return typeof window !== "undefined" && window.location.pathname.startsWith(item.href);
+                        })();
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`mobile-bottom-nav-item ${isActive ? "active" : ""}`}
+                            >
+                                <item.icon size={22} />
+                                <span>{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
 
             <style>{`
         .custom-scrollbar::-webkit-scrollbar {

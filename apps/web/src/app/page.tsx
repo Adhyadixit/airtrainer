@@ -487,7 +487,7 @@ function HeroSection() {
           </div>
 
           {/* Quick Stats */}
-          <div style={{ display: "flex", gap: "32px", marginTop: "48px" }}>
+          <div className="hero-quick-stats" style={{ display: "flex", gap: "24px", marginTop: "48px", flexWrap: "wrap" }}>
             {STATS.slice(0, 3).map((stat) => (
               <div key={stat.label}>
                 <div style={{ fontSize: "24px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)" }}>{stat.number}</div>
@@ -643,13 +643,15 @@ function HeroSection() {
         </div>
         <style>{`
           @media (max-width: 968px) {
-            #hero-content { grid-template-columns: 1fr !important; padding: 100px 16px 60px !important; }
+            #hero-content { grid-template-columns: 1fr !important; padding: 100px 16px 60px !important; gap: 32px !important; }
             .hero-visual { display: none !important; }
           }
           @media (max-width: 480px) {
-            .hero-search-bar { flex-direction: column !important; background: transparent !important; box-shadow: none !important; border: none !important; gap: 10px !important; }
+            .hero-search-bar { flex-direction: column !important; background: transparent !important; box-shadow: none !important; border: none !important; gap: 10px !important; max-width: 100% !important; }
             .hero-search-input { background: var(--surface); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); }
-            .hero-search-button { width: 100% !important; border-radius: var(--radius-lg); }
+            .hero-search-button { width: 100% !important; border-radius: var(--radius-lg); padding: 14px 24px !important; }
+            .hero-quick-stats { gap: 16px !important; }
+            .hero-quick-stats > div { min-width: 80px; }
           }
         `}</style>
       </div>
@@ -687,7 +689,7 @@ function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" style={{ padding: "120px 24px", background: "var(--surface-elevated)" }}>
+    <section id="how-it-works" style={{ padding: "80px 16px", background: "var(--surface-elevated)", overflowX: "hidden" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "64px" }} className="animate-fade-in-up">
           <div style={{
@@ -717,7 +719,7 @@ function HowItWorksSection() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px" }}>
+        <div className="steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px" }}>
           {steps.map((step, index) => (
             <div
               key={step.title}
@@ -773,7 +775,8 @@ function HowItWorksSection() {
 
         <style>{`
           @media (max-width: 768px) {
-            #how-it-works > div > div:last-child { grid-template-columns: 1fr !important; }
+            .steps-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+            #how-it-works { padding: 60px 16px !important; }
           }
         `}</style>
       </div>
@@ -787,7 +790,7 @@ function HowItWorksSection() {
 
 function FeaturedTrainersSection() {
   return (
-    <section id="find-trainers" style={{ padding: "120px 24px" }}>
+    <section id="find-trainers" style={{ padding: "80px 16px", overflowX: "hidden" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "48px", flexWrap: "wrap", gap: "16px" }}>
           <div>
@@ -830,7 +833,7 @@ function FeaturedTrainersSection() {
           </a>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
+        <div className="trainers-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
           {FEATURED_TRAINERS.map((trainer, index) => (
             <div
               key={trainer.name}
@@ -921,10 +924,11 @@ function FeaturedTrainersSection() {
 
         <style>{`
           @media (max-width: 1024px) {
-            #find-trainers > div > div:last-child { grid-template-columns: repeat(2, 1fr) !important; }
+            .trainers-grid { grid-template-columns: repeat(2, 1fr) !important; }
           }
           @media (max-width: 640px) {
-            #find-trainers > div > div:last-child { grid-template-columns: 1fr !important; }
+            .trainers-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+            #find-trainers { padding: 60px 16px !important; }
           }
         `}</style>
       </div>
@@ -938,7 +942,7 @@ function FeaturedTrainersSection() {
 
 function SportsSection() {
   return (
-    <section id="sports" style={{ padding: "120px 24px", background: "var(--surface-elevated)" }}>
+    <section id="sports" style={{ padding: "80px 16px", background: "var(--surface-elevated)", overflowX: "hidden" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "64px" }}>
           <div style={{
@@ -965,7 +969,7 @@ function SportsSection() {
           </h2>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px" }}>
+        <div className="sports-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px" }}>
           {SPORTS.map((sport, index) => (
             <div
               key={sport.name}
@@ -998,10 +1002,12 @@ function SportsSection() {
 
         <style>{`
           @media (max-width: 768px) {
-            #sports > div > div:last-child { grid-template-columns: repeat(3, 1fr) !important; }
+            .sports-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+            #sports { padding: 60px 16px !important; }
           }
           @media (max-width: 480px) {
-            #sports > div > div:last-child { grid-template-columns: repeat(2, 1fr) !important; }
+            .sports-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+            .sports-grid > div { padding: 20px 12px !important; }
           }
         `}</style>
       </div>
@@ -1046,9 +1052,9 @@ function WhySection() {
   ];
 
   return (
-    <section style={{ padding: "120px 24px" }}>
+    <section id="why-airtrainr" style={{ padding: "80px 16px", overflowX: "hidden" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
+        <div className="why-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
           <div>
             <div style={{
               display: "inline-block",
@@ -1077,7 +1083,7 @@ function WhySection() {
               Every feature is designed to make training accessible, safe, and effective.
             </p>
 
-            <div style={{
+            <div className="stats-row" style={{
               display: "flex",
               gap: "16px",
               padding: "24px",
@@ -1094,7 +1100,7 @@ function WhySection() {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+          <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
             {features.map((feature, index) => (
               <div
                 key={feature.title}
@@ -1137,10 +1143,13 @@ function WhySection() {
 
         <style>{`
           @media (max-width: 968px) {
-            section:last-of-type > div > div:first-child { grid-template-columns: 1fr !important; }
+            .why-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
           }
           @media (max-width: 640px) {
-            section:last-of-type > div > div:first-child > div:last-child { grid-template-columns: 1fr !important; }
+            .features-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+            #why-airtrainr { padding: 60px 16px !important; }
+            .stats-row { flex-wrap: wrap !important; gap: 12px !important; }
+            .stats-row > div { flex: 1 1 40% !important; text-align: center !important; }
           }
         `}</style>
       </div>
@@ -1155,7 +1164,7 @@ function WhySection() {
 function CTASection() {
   return (
     <section style={{
-      padding: "120px 24px",
+      padding: "80px 16px",
       background: "var(--gradient-dark)",
       position: "relative",
       overflow: "hidden",
@@ -1252,12 +1261,13 @@ function CTASection() {
 function Footer() {
   return (
     <footer style={{
-      padding: "80px 24px 40px",
+      padding: "60px 16px 40px",
       background: "var(--gray-950)",
       color: "var(--gray-400)",
+      overflowX: "hidden",
     }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", marginBottom: "64px" }}>
+        <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", marginBottom: "64px" }}>
           {/* Brand */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
@@ -1326,10 +1336,10 @@ function Footer() {
 
         <style>{`
           @media (max-width: 768px) {
-            footer > div > div:first-child { grid-template-columns: 1fr 1fr !important; }
+            .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
           }
           @media (max-width: 480px) {
-            footer > div > div:first-child { grid-template-columns: 1fr !important; }
+            .footer-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
           }
         `}</style>
       </div>

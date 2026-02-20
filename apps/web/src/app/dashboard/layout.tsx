@@ -13,8 +13,6 @@ import {
     Bell,
     Settings,
     LogOut,
-    Menu,
-    X,
     CreditCard,
     Star,
     Clock,
@@ -26,7 +24,6 @@ import {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -92,20 +89,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Profile", href: "/dashboard/profile", icon: Settings },
     ];
 
+    // Pick the most important items for mobile bottom nav (max 5)
+    const mobileNavItems = (() => {
+        if (user.role === "trainer") {
+            return [
+                { label: "Home", href: "/dashboard", icon: LayoutDashboard },
+                { label: "Bookings", href: "/dashboard/bookings", icon: Calendar },
+                { label: "Earnings", href: "/dashboard/earnings", icon: CreditCard },
+                { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
+                { label: "Profile", href: "/dashboard/profile", icon: Settings },
+            ];
+        }
+        if (user.role === "athlete") {
+            return [
+                { label: "Home", href: "/dashboard", icon: LayoutDashboard },
+                { label: "Search", href: "/dashboard/search", icon: Search },
+                { label: "Sessions", href: "/dashboard/bookings", icon: Calendar },
+                { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
+                { label: "Profile", href: "/dashboard/profile", icon: Settings },
+            ];
+        }
+        return [
+            { label: "Home", href: "/dashboard", icon: LayoutDashboard },
+            { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
+            { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
+            { label: "Profile", href: "/dashboard/profile", icon: Settings },
+        ];
+    })();
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] font-sans flex text-slate-900 selection:bg-indigo-500/30">
-            {/* Mobile Sidebar Overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
-            {/* Sidebar */}
+            {/* Desktop Sidebar — hidden on mobile */}
             <aside
-                className={`fixed lg:sticky top-0 h-screen inset-y-0 left-0 z-50 w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.02)] border-r border-slate-100 transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-                    }`}
+                className="hidden lg:flex fixed top-0 h-screen inset-y-0 left-0 z-50 w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.02)] border-r border-slate-100 flex-col"
             >
                 {/* Logo Area */}
                 <div className="h-20 flex items-center justify-between px-8 border-b border-slate-100/60 bg-white/50 backdrop-blur-md">
@@ -117,9 +133,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             AirTrainr
                         </span>
                     </Link>
-                    <button className="lg:hidden p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" onClick={() => setSidebarOpen(false)}>
-                        <X size={20} />
-                    </button>
                 </div>
 
                 {/* User Profile Card */}
@@ -156,7 +169,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     ? "bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100/50"
                                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                                     }`}
-                                onClick={() => setSidebarOpen(false)}
                             >
                                 {isActive && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 rounded-r-full"></div>
@@ -187,34 +199,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-h-screen overflow-hidden bg-slate-50/30">
-                {/* Mobile Header */}
-                <header className="lg:hidden h-20 bg-white/80 backdrop-blur-lg border-b border-slate-200/60 sticky top-0 flex items-center justify-between px-6 z-30 shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="p-2.5 bg-slate-50 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200/60"
-                        >
-                            <Menu size={20} />
-                        </button>
-                    </div>
-                    <Link href="/dashboard" className="flex items-center gap-2">
+            <div className="flex-1 flex flex-col min-h-screen overflow-hidden bg-slate-50/30 lg:ml-[280px]">
+                {/* Mobile Header — simplified, no hamburger needed */}
+                <header className="lg:hidden h-16 bg-white/90 backdrop-blur-lg border-b border-slate-200/60 sticky top-0 flex items-center justify-between px-4 z-30 shadow-sm">
+                    <Link href="/dashboard" className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white">
                             <Zap size={16} className="fill-white" />
                         </div>
                         <span className="font-bold text-slate-900 text-lg tracking-tight">AirTrainr</span>
                     </Link>
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-                        <span className="text-sm font-bold text-slate-600">{user.firstName.charAt(0)}</span>
+                    <div className="flex items-center gap-3">
+                        <Link href="/dashboard/notifications" className="relative p-2 rounded-xl bg-slate-50 border border-slate-100">
+                            <Bell size={18} className="text-slate-500" />
+                        </Link>
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-100 to-violet-100 flex items-center justify-center border border-slate-200">
+                            <span className="text-xs font-bold text-indigo-700">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</span>
+                        </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto w-full">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto w-full dashboard-main-content">
                     <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
                         {children}
                     </div>
                 </main>
+            </div>
+
+            {/* Mobile Bottom Navigation Bar */}
+            <div className="mobile-bottom-nav lg:hidden">
+                <div className="mobile-bottom-nav-items">
+                    {mobileNavItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`mobile-bottom-nav-item ${isActive ? "active" : ""}`}
+                            >
+                                <item.icon size={22} />
+                                <span>{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
