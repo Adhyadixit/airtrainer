@@ -53,7 +53,7 @@ export default function AdminPaymentsPage() {
                     amount: Number(booking.price),
                     platform_fee: Number(booking.platform_fee),
                     total_paid: Number(booking.total_paid),
-                    status: booking.status === 'completed' ? 'completed' : booking.status === 'cancelled' ? 'refunded' : 'pending',
+                    status: (booking.status === 'completed' ? 'completed' : booking.status === 'cancelled' ? 'refunded' : 'pending') as Payment['status'],
                     payment_method: "Credit Card", // Default since we don't have this field
                     created_at: booking.created_at,
                     booking: {
@@ -81,13 +81,13 @@ export default function AdminPaymentsPage() {
     const filteredPayments = payments.filter(payment => {
         const matchesSearch = `${payment.booking?.athlete_name} ${payment.booking?.trainer_name} ${payment.booking?.sport}`.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = filterStatus === "all" || payment.status === filterStatus;
-        
+
         let matchesDate = true;
         if (dateRange !== "all") {
             const paymentDate = new Date(payment.created_at);
             const now = new Date();
             const daysDiff = Math.floor((now.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
-            
+
             switch (dateRange) {
                 case "7days":
                     matchesDate = daysDiff <= 7;
@@ -100,7 +100,7 @@ export default function AdminPaymentsPage() {
                     break;
             }
         }
-        
+
         return matchesSearch && matchesStatus && matchesDate;
     });
 
@@ -326,7 +326,7 @@ export default function AdminPaymentsPage() {
                         </tbody>
                     </table>
                 </div>
-                
+
                 {filteredPayments.length === 0 && (
                     <div className="text-center py-12">
                         <CreditCard size={48} className="mx-auto text-[#cbd5e1] mb-4" />
