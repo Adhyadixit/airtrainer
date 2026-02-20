@@ -362,7 +362,7 @@ function HeroSection() {
         pointerEvents: "none",
       }} />
 
-      <div style={{
+      <div id="hero-content" style={{
         maxWidth: "1280px",
         margin: "0 auto",
         padding: "120px 24px 80px",
@@ -432,7 +432,7 @@ function HeroSection() {
           </p>
 
           {/* Search Bar */}
-          <div style={{
+          <div className="hero-search-bar" style={{
             display: "flex",
             gap: "0",
             background: "var(--surface)",
@@ -441,8 +441,9 @@ function HeroSection() {
             border: "1px solid var(--gray-200)",
             overflow: "hidden",
             maxWidth: "520px",
+            width: "100%",
           }}>
-            <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "16px 20px" }}>
+            <div className="hero-search-input" style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "16px 20px" }}>
               <Search />
               <input
                 type="text"
@@ -458,6 +459,7 @@ function HeroSection() {
               />
             </div>
             <button
+              className="hero-search-button"
               style={{
                 padding: "16px 32px",
                 background: "var(--gradient-primary)",
@@ -471,6 +473,7 @@ function HeroSection() {
                 gap: "8px",
                 transition: "all var(--transition-fast)",
                 whiteSpace: "nowrap",
+                justifyContent: "center",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.opacity = "0.9";
@@ -638,14 +641,18 @@ function HeroSection() {
             </div>
           </div>
         </div>
+        <style>{`
+          @media (max-width: 968px) {
+            #hero-content { grid-template-columns: 1fr !important; padding: 100px 16px 60px !important; }
+            .hero-visual { display: none !important; }
+          }
+          @media (max-width: 480px) {
+            .hero-search-bar { flex-direction: column !important; background: transparent !important; box-shadow: none !important; border: none !important; gap: 10px !important; }
+            .hero-search-input { background: var(--surface); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); }
+            .hero-search-button { width: 100% !important; border-radius: var(--radius-lg); }
+          }
+        `}</style>
       </div>
-
-      <style>{`
-        @media (max-width: 968px) {
-          #hero > div:first-of-type { grid-template-columns: 1fr !important; }
-          .hero-visual { display: none !important; }
-        }
-      `}</style>
     </section>
   );
 }

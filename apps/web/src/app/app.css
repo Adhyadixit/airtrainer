@@ -1,15 +1,69 @@
 ﻿@import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Space Grotesk", "Inter", sans-serif;
+:root {
+  /* Brand Colors */
   --color-brand-50: #eff6ff;
   --color-brand-100: #dbeafe;
   --color-brand-500: #3b82f6;
   --color-brand-600: #2563eb;
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
+
+  /* Colors */
+  --primary: var(--color-brand-600);
+  --primary-dark: var(--color-brand-900);
+  --primary-100: var(--color-brand-100);
+  --primary-50: var(--color-brand-50);
+  --accent: #06b6d4;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --gray-950: #020617;
+
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --foreground: var(--gray-900);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-brand-500), var(--color-brand-600));
+  --gradient-hero: linear-gradient(to bottom, #ffffff, #f1f5f9);
+  --gradient-dark: linear-gradient(to right, var(--gray-900), var(--gray-950));
+
+  /* Radii */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+
+  /* Layout */
+  --nav-height: 80px;
 }
+
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+}
+
 
 @source "../";
 

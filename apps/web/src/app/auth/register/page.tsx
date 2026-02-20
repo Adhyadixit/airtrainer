@@ -96,6 +96,7 @@ export default function RegisterPage() {
             }}
         >
             <div
+                className="register-card"
                 style={{
                     width: "100%",
                     maxWidth: "520px",
@@ -165,7 +166,7 @@ export default function RegisterPage() {
 
                 {step === 2 && (
                     <form onSubmit={(e) => { e.preventDefault(); setStep(3); }} style={{ animation: "fadeInUp 0.4s ease-out" }}>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+                        <div className="form-grid" style={{ display: "grid", gap: "16px", marginBottom: "16px" }}>
                             <div>
                                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, marginBottom: "8px", color: "var(--gray-700)" }}>First Name</label>
                                 <input type="text" value={formData.firstName} onChange={(e) => updateField("firstName", e.target.value)} placeholder="John" required style={inputStyle}
@@ -195,7 +196,7 @@ export default function RegisterPage() {
                             <p style={{ fontSize: "12px", color: "var(--gray-400)", marginTop: "6px" }}>Must be at least 18 years old</p>
                         </div>
 
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+                        <div className="form-grid" style={{ display: "grid", gap: "16px", marginBottom: "24px" }}>
                             <div>
                                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, marginBottom: "8px", color: "var(--gray-700)" }}>Password</label>
                                 <input type="password" value={formData.password} onChange={(e) => updateField("password", e.target.value)} placeholder="8+ characters" required minLength={8} style={inputStyle}
@@ -254,6 +255,14 @@ export default function RegisterPage() {
                     Already have an account?{" "}
                     <a href="/auth/login" style={{ color: "var(--primary)", textDecoration: "none", fontWeight: 600 }}>Sign in</a>
                 </p>
+
+                <style>{`
+                  .form-grid { grid-template-columns: 1fr 1fr; }
+                  @media (max-width: 480px) {
+                    .form-grid { grid-template-columns: 1fr !important; }
+                    .register-card { padding: 32px 20px !important; }
+                  }
+                `}</style>
             </div>
         </div>
     );

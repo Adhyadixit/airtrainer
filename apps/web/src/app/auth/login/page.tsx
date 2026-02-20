@@ -37,6 +37,7 @@ export default function LoginPage() {
             }}
         >
             <div
+                className="login-card"
                 style={{
                     width: "100%",
                     maxWidth: "440px",
@@ -242,6 +243,12 @@ export default function LoginPage() {
                         Sign up
                     </a>
                 </p>
+
+                <style>{`
+                  @media (max-width: 480px) {
+                    .login-card { padding: 32px 20px !important; }
+                  }
+                `}</style>
             </div>
         </div>
     );
