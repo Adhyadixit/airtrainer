@@ -44,6 +44,16 @@ export default function NotificationsPage() {
         setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     };
 
+    const clearAllNotifications = async () => {
+        if (!user) return;
+        try {
+            await supabase.from("notifications").delete().eq("user_id", user.id);
+            setNotifications([]);
+        } catch (err) {
+            console.error("Failed to clear notifications:", err);
+        }
+    };
+
     const unreadCount = notifications.filter((n) => !n.read).length;
 
     const typeIcons: Record<string, string> = {
@@ -81,11 +91,18 @@ export default function NotificationsPage() {
                         {unreadCount > 0 ? `${unreadCount} unread` : "All caught up!"}
                     </p>
                 </div>
-                {unreadCount > 0 && (
-                    <button onClick={markAllRead} style={{ padding: "8px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--gray-200)", background: "var(--surface)", color: "var(--primary)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-                        Mark all read
-                    </button>
-                )}
+                <div style={{ display: "flex", gap: "8px" }}>
+                    {unreadCount > 0 && (
+                        <button onClick={markAllRead} style={{ padding: "8px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--gray-200)", background: "var(--surface)", color: "var(--primary)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                            Mark all read
+                        </button>
+                    )}
+                    {notifications.length > 0 && (
+                        <button onClick={clearAllNotifications} style={{ padding: "8px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--gray-200)", background: "var(--surface)", color: "var(--error)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                            Clear all
+                        </button>
+                    )}
+                </div>
             </div>
 
             {notifications.length === 0 ? (

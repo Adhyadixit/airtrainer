@@ -18,6 +18,7 @@ export type UserRow = {
     sex: string | null;
     email_verified: boolean;
     phone_verified: boolean;
+    is_approved: boolean;
     avatar_url: string | null;
     created_at: string;
     updated_at: string;

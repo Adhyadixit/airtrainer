@@ -204,7 +204,7 @@ export default function SearchTrainersPage() {
                     <p style={{ color: "var(--gray-500)" }}>No trainers match your filters. Try broadening your search.</p>
                 </div>
             ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "20px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "24px", alignItems: "stretch" }}>
                     {filteredTrainers.map((trainer) => (
                         <div
                             key={trainer.id}
@@ -214,6 +214,9 @@ export default function SearchTrainersPage() {
                                 border: "1px solid var(--gray-200)",
                                 overflow: "hidden",
                                 transition: "all var(--transition-fast)",
+                                display: "flex",
+                                flexDirection: "column",
+                                height: "100%",
                             }}
                         >
                             {/* Card header */}
@@ -253,7 +256,7 @@ export default function SearchTrainersPage() {
                             </div>
 
                             {/* Card body */}
-                            <div style={{ padding: "20px 24px" }}>
+                            <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
                                 <div style={{ display: "flex", gap: "20px", marginBottom: "16px", flexWrap: "wrap" }}>
                                     <div>
                                         <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--primary)" }}>${Number(trainer.hourly_rate).toFixed(0)}</div>
@@ -289,27 +292,29 @@ export default function SearchTrainersPage() {
                                     </div>
                                 )}
 
-                                <button
-                                    onClick={() => {
-                                        setBookingModal(trainer);
-                                        setBookingForm((prev) => ({ ...prev, sport: trainer.sports[0] || "" }));
-                                    }}
-                                    style={{
-                                        width: "100%",
-                                        padding: "12px",
-                                        borderRadius: "var(--radius-md)",
-                                        background: "var(--gradient-primary)",
-                                        color: "white",
-                                        border: "none",
-                                        fontWeight: 700,
-                                        fontSize: "14px",
-                                        cursor: "pointer",
-                                        transition: "all var(--transition-fast)",
-                                        boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
-                                    }}
-                                >
-                                    Book Session
-                                </button>
+                                <div style={{ marginTop: "auto" }}>
+                                    <button
+                                        onClick={() => {
+                                            setBookingModal(trainer);
+                                            setBookingForm((prev) => ({ ...prev, sport: trainer.sports[0] || "" }));
+                                        }}
+                                        style={{
+                                            width: "100%",
+                                            padding: "12px",
+                                            borderRadius: "var(--radius-md)",
+                                            background: "var(--gradient-primary)",
+                                            color: "white",
+                                            border: "none",
+                                            fontWeight: 700,
+                                            fontSize: "14px",
+                                            cursor: "pointer",
+                                            transition: "all var(--transition-fast)",
+                                            boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
+                                        }}
+                                    >
+                                        Book Session
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

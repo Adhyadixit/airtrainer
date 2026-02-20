@@ -8,6 +8,7 @@ export interface AuthUser {
     role: 'athlete' | 'trainer' | 'admin';
     firstName: string;
     lastName: string;
+    isApproved: boolean;
     avatarUrl: string | null;
     trainerProfile?: TrainerProfileRow | null;
     athleteProfile?: AthleteProfileRow | null;
@@ -107,6 +108,7 @@ export async function loginUser(email: string, password: string): Promise<AuthUs
         role: u.role,
         firstName: u.first_name,
         lastName: u.last_name,
+        isApproved: u.is_approved || false,
         avatarUrl: u.avatar_url,
         trainerProfile,
         athleteProfile,
@@ -161,6 +163,7 @@ export async function registerUser(data: {
             last_name: data.lastName,
             date_of_birth: data.dateOfBirth,
             email_verified: false,
+            is_approved: false,
         })
         .select()
         .single();
@@ -218,6 +221,7 @@ export async function registerUser(data: {
         role: u.role,
         firstName: u.first_name,
         lastName: u.last_name,
+        isApproved: u.is_approved || false,
         avatarUrl: u.avatar_url,
         trainerProfile,
         athleteProfile,

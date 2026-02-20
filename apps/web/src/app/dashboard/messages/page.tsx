@@ -45,6 +45,47 @@ export default function MessagesPage() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    // Subscribe to real-time messages
+    useEffect(() => {
+        if (!selectedBookingId) return;
+
+        const subscription = supabase
+            .channel(`messages:${selectedBookingId}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "messages",
+                    filter: `booking_id=eq.${selectedBookingId}`,
+                },
+                (payload) => {
+                    const newMessage = payload.new as Message;
+                    // Only add if not already in list (prevent duplicates)
+                    setMessages((prev) => {
+                        if (prev.some((m) => m.id === newMessage.id)) {
+                            return prev;
+                        }
+                        return [...prev, newMessage];
+                    });
+
+                    // Update conversation last message
+                    setConversations((prev) =>
+                        prev.map((c) =>
+                            c.bookingId === selectedBookingId
+                                ? { ...c, lastMessage: newMessage.content, lastMessageAt: newMessage.created_at }
+                                : c
+                        )
+                    );
+                }
+            )
+            .subscribe();
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [selectedBookingId]);
+
     const loadConversations = async (u: AuthUser) => {
         try {
             // Get all bookings where user is involved

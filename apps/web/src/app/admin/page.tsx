@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSession, AuthUser } from "@/lib/auth";
 import { Users, Dumbbell, CalendarCheck, TrendingUp, ShieldAlert, CreditCard } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminDashboardPage() {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -65,9 +66,9 @@ export default function AdminDashboardPage() {
                 <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
                     <div className="px-6 py-5 border-b border-[#e2e8f0] flex items-center justify-between bg-white relative">
                         <h3 className="text-xl font-bold text-[#0f172a]">Recent Signups</h3>
-                        <button className="text-[#2563eb] text-sm font-semibold hover:text-[#1e3a8a] transition-colors">
+                        <Link href="/admin/athletes" className="text-[#2563eb] text-sm font-semibold hover:text-[#1e3a8a] transition-colors">
                             View All
-                        </button>
+                        </Link>
                     </div>
                     <div className="flex-1 overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -125,7 +126,7 @@ export default function AdminDashboardPage() {
                         <h3 className="text-xl font-bold text-[#0f172a]">Quick Actions</h3>
                     </div>
                     <div className="p-6 space-y-4 flex-1 bg-[#f8fafc]/50">
-                        <button className="w-full flex items-center justify-between p-4 bg-white border border-[#e2e8f0] rounded-xl hover:border-[#3b82f6] hover:shadow-md transition-all group">
+                        <Link href="/admin/trainers" className="w-full flex items-center justify-between p-4 bg-white border border-[#e2e8f0] rounded-xl hover:border-[#3b82f6] hover:shadow-md transition-all group">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-lg bg-[#eff6ff] text-[#2563eb] flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <Dumbbell size={20} />
@@ -138,8 +139,8 @@ export default function AdminDashboardPage() {
                             <div className="w-6 h-6 rounded-full bg-[#f1f5f9] flex items-center justify-center text-[#64748b] group-hover:bg-[#2563eb] group-hover:text-white transition-colors">
                                 &rarr;
                             </div>
-                        </button>
-                        <button className="w-full flex items-center justify-between p-4 bg-white border border-[#e2e8f0] rounded-xl hover:border-[#3b82f6] hover:shadow-md transition-all group">
+                        </Link>
+                        <Link href="/admin/disputes" className="w-full flex items-center justify-between p-4 bg-white border border-[#e2e8f0] rounded-xl hover:border-[#ef4444] hover:shadow-md transition-all group">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-lg bg-[#fef2f2] text-[#ef4444] flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <ShieldAlert size={20} />
@@ -152,8 +153,8 @@ export default function AdminDashboardPage() {
                             <div className="w-6 h-6 rounded-full bg-[#f1f5f9] flex items-center justify-center text-[#64748b] group-hover:bg-[#ef4444] group-hover:text-white transition-colors">
                                 &rarr;
                             </div>
-                        </button>
-                        <button className="w-full flex items-center justify-between p-4 bg-white border border-[#e2e8f0] rounded-xl hover:border-[#3b82f6] hover:shadow-md transition-all group">
+                        </Link>
+                        <Link href="/admin/payments" className="w-full flex items-center justify-between p-4 bg-white border border-[#e2e8f0] rounded-xl hover:border-[#10b981] hover:shadow-md transition-all group">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-lg bg-[#ecfdf5] text-[#10b981] flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <CreditCard size={20} />
@@ -166,7 +167,7 @@ export default function AdminDashboardPage() {
                             <div className="w-6 h-6 rounded-full bg-[#f1f5f9] flex items-center justify-center text-[#64748b] group-hover:bg-[#10b981] group-hover:text-white transition-colors">
                                 &rarr;
                             </div>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

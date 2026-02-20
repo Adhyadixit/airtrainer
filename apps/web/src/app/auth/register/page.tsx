@@ -37,6 +37,46 @@ export default function RegisterPage() {
         }));
     };
 
+    const validateAge = (dob: string): boolean => {
+        if (!dob) return false;
+        const birthDate = new Date(dob);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        // Adjust age if birthday hasn't occurred this year
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            return age - 1 >= 18;
+        }
+        return age >= 18;
+    };
+
+    const handleStep2Submit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Validate age before proceeding
+        if (!validateAge(formData.dateOfBirth)) {
+            setError("You must be at least 18 years old to register");
+            return;
+        }
+
+        // Validate passwords match
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        if (formData.password.length < 8) {
+            setError("Password must be at least 8 characters");
+            return;
+        }
+
+        // Clear error and proceed to step 3
+        setError("");
+        setStep(3);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -165,7 +205,7 @@ export default function RegisterPage() {
                 )}
 
                 {step === 2 && (
-                    <form onSubmit={(e) => { e.preventDefault(); setStep(3); }} style={{ animation: "fadeInUp 0.4s ease-out" }}>
+                    <form onSubmit={handleStep2Submit} style={{ animation: "fadeInUp 0.4s ease-out" }}>
                         <div className="form-grid" style={{ display: "grid", gap: "16px", marginBottom: "16px" }}>
                             <div>
                                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, marginBottom: "8px", color: "var(--gray-700)" }}>First Name</label>
@@ -190,9 +230,24 @@ export default function RegisterPage() {
 
                         <div style={{ marginBottom: "16px" }}>
                             <label style={{ display: "block", fontSize: "14px", fontWeight: 600, marginBottom: "8px", color: "var(--gray-700)" }}>Date of Birth</label>
-                            <input type="date" value={formData.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value)} required style={inputStyle}
+                            <input type="date" value={formData.dateOfBirth} 
+                                onChange={(e) => {
+                                    updateField("dateOfBirth", e.target.value);
+                                    // Clear error when user changes date
+                                    if (error?.includes("18 years")) {
+                                        setError("");
+                                    }
+                                }} 
+                                required style={inputStyle}
+                                max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
                                 onFocus={(e) => (e.currentTarget.style.borderColor = "var(--primary)")}
-                                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--gray-200)")} />
+                                onBlur={(e) => {
+                                    e.currentTarget.style.borderColor = "var(--gray-200)";
+                                    // Validate age on blur
+                                    if (e.target.value && !validateAge(e.target.value)) {
+                                        setError("You must be at least 18 years old to register");
+                                    }
+                                }} />
                             <p style={{ fontSize: "12px", color: "var(--gray-400)", marginTop: "6px" }}>Must be at least 18 years old</p>
                         </div>
 

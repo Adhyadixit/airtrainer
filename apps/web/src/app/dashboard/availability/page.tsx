@@ -22,6 +22,8 @@ export default function AvailabilityPage() {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
 
+    const [error, setError] = useState("");
+
     // New slot form
     const [newSlot, setNewSlot] = useState({ day: 1, start: "09:00", end: "17:00" });
 
@@ -52,9 +54,31 @@ export default function AvailabilityPage() {
 
     const addSlot = async () => {
         if (!user) return;
+        
+        // Validate start time is before end time
+        if (newSlot.start >= newSlot.end) {
+            setError("Start time must be before end time");
+            return;
+        }
+        
+        // Check for conflicts with existing slots
+        const conflictingSlot = slots.find((s) => 
+            s.day_of_week === newSlot.day && 
+            s.is_active &&
+            ((newSlot.start >= s.start_time.slice(0, 5) && newSlot.start < s.end_time.slice(0, 5)) ||
+             (newSlot.end > s.start_time.slice(0, 5) && newSlot.end <= s.end_time.slice(0, 5)) ||
+             (newSlot.start <= s.start_time.slice(0, 5) && newSlot.end >= s.end_time.slice(0, 5)))
+        );
+        
+        if (conflictingSlot) {
+            setError(`Time conflicts with existing slot: ${conflictingSlot.start_time.slice(0, 5)} - ${conflictingSlot.end_time.slice(0, 5)}`);
+            return;
+        }
+        
+        setError("");
         setSaving(true);
         try {
-            const { data, error } = await supabase
+            const { data, error: insertError } = await supabase
                 .from("availability_slots")
                 .insert({
                     trainer_id: user.id,
@@ -66,12 +90,13 @@ export default function AvailabilityPage() {
                 .select()
                 .single();
 
-            if (error) throw error;
+            if (insertError) throw insertError;
             setSlots((prev) => [...prev, data as AvailabilitySlot].sort((a, b) => a.day_of_week - b.day_of_week));
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
         } catch (err) {
             console.error("Failed to add slot:", err);
+            setError("Failed to add slot. Please try again.");
         } finally {
             setSaving(false);
         }
@@ -122,6 +147,12 @@ export default function AvailabilityPage() {
             {saved && (
                 <div style={{ padding: "12px 16px", background: "#d1fae5", borderRadius: "var(--radius-md)", color: "#059669", fontSize: "14px", fontWeight: 600, marginBottom: "24px" }}>
                     ✅ Availability updated!
+                </div>
+            )}
+
+            {error && (
+                <div style={{ padding: "12px 16px", background: "#fef2f2", borderRadius: "var(--radius-md)", color: "#dc2626", fontSize: "14px", fontWeight: 600, marginBottom: "24px", borderLeft: "4px solid #dc2626" }}>
+                    ❌ {error}
                 </div>
             )}
 

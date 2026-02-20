@@ -28,6 +28,8 @@ model User {
   avatarUrl     String?   @map("avatar_url") @db.VarChar(500)
   emailVerified Boolean   @default(false) @map("email_verified")
   phoneVerified Boolean   @default(false) @map("phone_verified")
+  isApproved    Boolean   @default(false) @map("is_approved")
+
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")

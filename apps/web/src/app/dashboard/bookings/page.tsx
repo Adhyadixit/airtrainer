@@ -14,6 +14,13 @@ export default function BookingsPage() {
     const [filter, setFilter] = useState<string>("all");
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+    
+    // Review modal state
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [reviewBooking, setReviewBooking] = useState<BookingWithUser | null>(null);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewText, setReviewText] = useState("");
+    const [submittingReview, setSubmittingReview] = useState(false);
 
     useEffect(() => {
         const session = getSession();
@@ -67,6 +74,49 @@ export default function BookingsPage() {
 
             await supabase.from("bookings").update(updates).eq("id", bookingId);
 
+            // Get booking details for notification
+            const booking = bookings.find((b) => b.id === bookingId);
+            if (booking) {
+                const isTrainer = user?.role === "trainer";
+                const isAthlete = user?.role === "athlete";
+
+                // Send notification when coach confirms booking
+                if (newStatus === "confirmed" && isTrainer) {
+                    await supabase.from("notifications").insert({
+                        user_id: booking.athlete_id,
+                        type: "BOOKING_CONFIRMED",
+                        title: "Booking Confirmed",
+                        body: `Your trainer has confirmed your booking for ${booking.sport}.`,
+                        data: { booking_id: bookingId },
+                        read: false,
+                    });
+                }
+
+                // Send notification when coach marks complete
+                if (newStatus === "completed" && isTrainer) {
+                    await supabase.from("notifications").insert({
+                        user_id: booking.athlete_id,
+                        type: "BOOKING_COMPLETED",
+                        title: "Session Completed",
+                        body: `Your ${booking.sport} session has been marked as completed. Please leave a review!`,
+                        data: { booking_id: bookingId },
+                        read: false,
+                    });
+                }
+
+                // Send notification when athlete cancels (to trainer)
+                if (newStatus === "cancelled" && isAthlete) {
+                    await supabase.from("notifications").insert({
+                        user_id: booking.trainer_id,
+                        type: "BOOKING_CANCELLED",
+                        title: "Booking Cancelled",
+                        body: `A booking for ${booking.sport} has been cancelled by the athlete.`,
+                        data: { booking_id: bookingId },
+                        read: false,
+                    });
+                }
+            }
+
             setBookings((prev) =>
                 prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus as BookingRow["status"] } : b))
             );
@@ -75,6 +125,45 @@ export default function BookingsPage() {
         } finally {
             setActionLoading(null);
         }
+    };
+
+    const submitReview = async () => {
+        if (!user || !reviewBooking) return;
+        setSubmittingReview(true);
+        try {
+            await supabase.from("reviews").insert({
+                booking_id: reviewBooking.id,
+                reviewer_id: user.id,
+                reviewee_id: reviewBooking.trainer_id,
+                rating: reviewRating,
+                review_text: reviewText || null,
+                is_public: true,
+            });
+            
+            // Send notification to trainer
+            await supabase.from("notifications").insert({
+                user_id: reviewBooking.trainer_id,
+                type: "REVIEW_RECEIVED",
+                title: "New Review Received",
+                body: `You received a ${reviewRating}-star review for your ${reviewBooking.sport} session.`,
+                data: { booking_id: reviewBooking.id },
+                read: false,
+            });
+            
+            setReviewModalOpen(false);
+            setReviewBooking(null);
+            setReviewRating(5);
+            setReviewText("");
+        } catch (err) {
+            console.error("Failed to submit review:", err);
+        } finally {
+            setSubmittingReview(false);
+        }
+    };
+
+    const openReviewModal = (booking: BookingWithUser) => {
+        setReviewBooking(booking);
+        setReviewModalOpen(true);
     };
 
     const filteredBookings = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
@@ -289,6 +378,23 @@ export default function BookingsPage() {
                                                     Mark Complete
                                                 </button>
                                             )}
+                                            {booking.status === "completed" && !isTrainer && (
+                                                <button
+                                                    onClick={() => openReviewModal(booking)}
+                                                    style={{
+                                                        padding: "6px 14px",
+                                                        borderRadius: "var(--radius-md)",
+                                                        background: "#f59e0b",
+                                                        color: "white",
+                                                        border: "none",
+                                                        fontSize: "12px",
+                                                        fontWeight: 600,
+                                                        cursor: "pointer",
+                                                    }}
+                                                >
+                                                    ⭐ Leave Review
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -301,6 +407,100 @@ export default function BookingsPage() {
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Review Modal */}
+            {reviewModalOpen && reviewBooking && (
+                <div
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.5)",
+                        backdropFilter: "blur(4px)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 50,
+                        padding: "24px",
+                    }}
+                    onClick={(e) => { if (e.target === e.currentTarget) setReviewModalOpen(false); }}
+                >
+                    <div style={{ background: "var(--surface)", borderRadius: "var(--radius-xl)", padding: "36px", width: "100%", maxWidth: "480px", animation: "fadeInUp 0.3s ease-out" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+                            <h3 style={{ fontSize: "20px", fontWeight: 800, fontFamily: "var(--font-display)" }}>
+                                Leave a Review
+                            </h3>
+                            <button onClick={() => setReviewModalOpen(false)} style={{ border: "none", background: "none", fontSize: "20px", cursor: "pointer", color: "var(--gray-400)" }}>✕</button>
+                        </div>
+
+                        <div style={{ marginBottom: "24px" }}>
+                            <p style={{ fontSize: "14px", color: "var(--gray-500)", marginBottom: "16px" }}>
+                                How was your session with {reviewBooking.other_user?.first_name}?
+                            </p>
+
+                            {/* Star Rating */}
+                            <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginBottom: "24px" }}>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        onClick={() => setReviewRating(star)}
+                                        style={{
+                                            fontSize: "32px",
+                                            border: "none",
+                                            background: "none",
+                                            cursor: "pointer",
+                                            color: star <= reviewRating ? "#f59e0b" : "var(--gray-300)",
+                                            transition: "color var(--transition-fast)",
+                                        }}
+                                    >
+                                        ★
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Review Text */}
+                            <div style={{ marginBottom: "20px" }}>
+                                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, marginBottom: "6px", color: "var(--gray-700)" }}>
+                                    Your Review (optional)
+                                </label>
+                                <textarea
+                                    value={reviewText}
+                                    onChange={(e) => setReviewText(e.target.value)}
+                                    placeholder="Share your experience..."
+                                    style={{
+                                        width: "100%",
+                                        padding: "12px",
+                                        borderRadius: "var(--radius-md)",
+                                        border: "1px solid var(--gray-200)",
+                                        fontSize: "14px",
+                                        outline: "none",
+                                        minHeight: "100px",
+                                        resize: "vertical",
+                                    }}
+                                />
+                            </div>
+
+                            <button
+                                onClick={submitReview}
+                                disabled={submittingReview}
+                                style={{
+                                    width: "100%",
+                                    padding: "14px",
+                                    borderRadius: "var(--radius-md)",
+                                    background: submittingReview ? "var(--gray-300)" : "var(--gradient-primary)",
+                                    color: "white",
+                                    border: "none",
+                                    fontWeight: 700,
+                                    fontSize: "15px",
+                                    cursor: submittingReview ? "not-allowed" : "pointer",
+                                    boxShadow: submittingReview ? "none" : "0 2px 8px rgba(99, 102, 241, 0.3)",
+                                }}
+                            >
+                                {submittingReview ? "Submitting..." : "Submit Review"}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

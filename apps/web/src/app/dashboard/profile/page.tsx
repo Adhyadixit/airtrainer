@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSession, setSession, AuthUser } from "@/lib/auth";
+import { getSession, setSession, clearSession, AuthUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
 export default function ProfilePage() {
@@ -9,6 +9,8 @@ export default function ProfilePage() {
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
@@ -97,6 +99,23 @@ export default function ProfilePage() {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!user) return;
+        setDeleting(true);
+        try {
+            // Soft delete - update deleted_at timestamp
+            await supabase.from("users").update({ deleted_at: new Date().toISOString() }).eq("id", user.id);
+
+            // Clear session and redirect to login
+            await clearSession();
+            window.location.href = "/auth/login";
+        } catch (err) {
+            console.error("Failed to delete account:", err);
+            setDeleting(false);
+            setShowDeleteConfirm(false);
+        }
+    };
+
     const SPORTS = [
         "hockey", "baseball", "basketball", "football", "soccer",
         "tennis", "golf", "swimming", "boxing", "lacrosse",
@@ -137,9 +156,14 @@ export default function ProfilePage() {
                             </button>
                         </>
                     ) : (
-                        <button onClick={() => setEditing(true)} style={{ padding: "10px 20px", borderRadius: "var(--radius-md)", background: "var(--gradient-primary)", color: "white", border: "none", fontWeight: 600, fontSize: "14px", cursor: "pointer", boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)" }}>
-                            Edit Profile
-                        </button>
+                        <>
+                            <button onClick={() => setShowDeleteConfirm(true)} style={{ padding: "10px 20px", borderRadius: "var(--radius-md)", border: "1px solid #fca5a5", background: "#fef2f2", color: "#dc2626", fontWeight: 600, fontSize: "14px", cursor: "pointer" }}>
+                                Delete Account
+                            </button>
+                            <button onClick={() => setEditing(true)} style={{ padding: "10px 20px", borderRadius: "var(--radius-md)", background: "var(--gradient-primary)", color: "white", border: "none", fontWeight: 600, fontSize: "14px", cursor: "pointer", boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)" }}>
+                                Edit Profile
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
@@ -260,6 +284,72 @@ export default function ProfilePage() {
                     })}
                 </div>
             </div>
+
+            {/* Delete Account Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div style={{
+                    position: "fixed",
+                    inset: 0,
+                    background: "rgba(0,0,0,0.5)",
+                    backdropFilter: "blur(4px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 50,
+                    padding: "24px",
+                }}>
+                    <div style={{
+                        background: "var(--surface)",
+                        borderRadius: "var(--radius-xl)",
+                        padding: "32px",
+                        width: "100%",
+                        maxWidth: "400px",
+                        textAlign: "center",
+                    }}>
+                        <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+                        <h3 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "8px", fontFamily: "var(--font-display)" }}>
+                            Delete Account?
+                        </h3>
+                        <p style={{ color: "var(--gray-500)", fontSize: "14px", marginBottom: "24px" }}>
+                            This action cannot be undone. Your account will be permanently deleted.
+                        </p>
+                        <div style={{ display: "flex", gap: "12px" }}>
+                            <button
+                                onClick={() => setShowDeleteConfirm(false)}
+                                disabled={deleting}
+                                style={{
+                                    flex: 1,
+                                    padding: "12px",
+                                    borderRadius: "var(--radius-md)",
+                                    border: "1px solid var(--gray-200)",
+                                    background: "var(--surface)",
+                                    color: "var(--foreground)",
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteAccount}
+                                disabled={deleting}
+                                style={{
+                                    flex: 1,
+                                    padding: "12px",
+                                    borderRadius: "var(--radius-md)",
+                                    background: "#dc2626",
+                                    color: "white",
+                                    border: "none",
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                }}
+                            >
+                                {deleting ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
