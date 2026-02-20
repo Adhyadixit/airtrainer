@@ -20,6 +20,7 @@ import {
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
+    const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -143,10 +144,30 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                             Admin
                         </span>
                     </Link>
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1e3a8a] to-[#3b82f6] flex items-center justify-center text-white text-xs font-bold">
+                    <div className="flex items-center gap-2 relative">
+                        <button
+                            onClick={() => setMobileProfileOpen(!mobileProfileOpen)}
+                            className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1e3a8a] to-[#3b82f6] flex items-center justify-center text-white text-xs font-bold"
+                        >
                             {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                        </div>
+                        </button>
+
+                        {/* Mobile Profile Dropdown */}
+                        {mobileProfileOpen && (
+                            <div className="absolute top-10 right-0 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50 overflow-hidden">
+                                <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                                    <p className="text-sm font-bold text-slate-800">{user.firstName} {user.lastName}</p>
+                                    <p className="text-xs text-slate-500">{user.email}</p>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#ef4444] hover:bg-[#fef2f2] transition-colors"
+                                >
+                                    <LogOut size={16} />
+                                    <span>Log Out</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </header>
 

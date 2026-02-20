@@ -24,6 +24,7 @@ import {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
+    const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -208,13 +209,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </div>
                         <span className="font-bold text-slate-900 text-lg tracking-tight">AirTrainr</span>
                     </Link>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                         <Link href="/dashboard/notifications" className="relative p-2 rounded-xl bg-slate-50 border border-slate-100">
                             <Bell size={18} className="text-slate-500" />
                         </Link>
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-100 to-violet-100 flex items-center justify-center border border-slate-200">
+                        <button
+                            onClick={() => setMobileProfileOpen(!mobileProfileOpen)}
+                            className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-100 to-violet-100 flex items-center justify-center border border-slate-200"
+                        >
                             <span className="text-xs font-bold text-indigo-700">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</span>
-                        </div>
+                        </button>
+
+                        {/* Mobile Profile Dropdown */}
+                        {mobileProfileOpen && (
+                            <div className="absolute top-12 right-0 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50 overflow-hidden">
+                                <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                                    <p className="text-sm font-bold text-slate-800">{user.firstName} {user.lastName}</p>
+                                    <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                                >
+                                    <LogOut size={16} />
+                                    <span>Log Out</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </header>
 
