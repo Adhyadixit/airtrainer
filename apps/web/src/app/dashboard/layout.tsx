@@ -37,6 +37,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 router.push("/auth/login");
                 return;
             }
+
+            // Redirect admins to the dedicated admin layout
+            if (session.role === "admin") {
+                router.push("/admin");
+                return;
+            }
+
             setUser(session);
             setLoading(false);
         };
@@ -146,8 +153,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 key={item.href}
                                 href={item.href}
                                 className={`group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden ${isActive
-                                        ? "bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100/50"
-                                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                                    ? "bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100/50"
+                                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                                     }`}
                                 onClick={() => setSidebarOpen(false)}
                             >
